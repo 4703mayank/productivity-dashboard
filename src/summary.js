@@ -2,7 +2,6 @@ import { getState, setState } from "./store.js";
 import {
   fmtDate,
   fmtTime,
-  fmtDuration,
   round2,
   totalContribution,
   workWindow,
@@ -25,12 +24,7 @@ export function renderSummary() {
   const total = totalContribution(counters);
   const dailyTarget = Number(settings.dailyTarget) || 0;
   const hourlyTarget = Number(settings.hourlyTarget) || 0;
-  const now = new Date();
-  const win = workWindow(settings, now);
-
-  document.getElementById("sumWorkingTime").textContent =
-    "Working time " + fmtDuration(win.elapsed);
-
+  
   // Daily — total / editable target. Percentage is uncapped.
   const dailyRemaining = Math.max(0, dailyTarget - total);
   const dailyPct = dailyTarget > 0 ? (total / dailyTarget) * 100 : 0;

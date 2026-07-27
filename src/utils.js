@@ -18,8 +18,13 @@ export function contribution(counter) {
   return counter.ratio > 0 ? counter.count / counter.ratio : 0;
 }
 
+// Only counters with includeInTotal !== false count toward the sum;
+// contribution() itself is untouched so a card can still show its own
+// number even while excluded from the total.
 export function totalContribution(counters) {
-  return counters.reduce((sum, c) => sum + contribution(c), 0);
+  return counters
+    .filter((c) => c.includeInTotal !== false)
+    .reduce((sum, c) => sum + contribution(c), 0);
 }
 
 // ---- Time / date formatting ----

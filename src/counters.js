@@ -43,6 +43,7 @@ function buildCard(counter, index) {
   card.className = "counter";
   card.dataset.id = counter.id;
   if (counter.id === selectedId) card.classList.add("is-selected");
+  if (counter.includeInTotal === false) card.classList.add("is-excluded");
 
   const contrib = contribution(counter);
 
@@ -57,10 +58,22 @@ function buildCard(counter, index) {
         <button class="counter__del" data-act="del" title="Delete counter" aria-label="Delete counter">×</button>
       </div>
     </div>
+
+    <div class="counter__toggle-row">
+      <label class="counter__toggle" title="Include this counter in the total sum">
+        <input type="checkbox" data-include ${counter.includeInTotal !== false ? "checked" : ""} />
+        <span class="counter__toggle-track"><span class="counter__toggle-thumb"></span></span>
+      </label>
+      <span class="counter__toggle-label">Count in total</span>
+    </div>
+
     <div class="counter__count">
       <input type="number" min="0" step="1" value="${counter.count}" data-count aria-label="Count" />
     </div>
-    <div class="counter__contribution"> <b>Contribution <b>${round2(contrib).toFixed(2)}  </b></div>
+    <div class="counter__contribution">
+      contribution <b>${round2(contrib).toFixed(2)}</b>
+      ${counter.includeInTotal === false ? '<span class="counter__excluded-tag">Not counted</span>' : ""}
+    </div>
     <div class="counter__btns">
       <button class="counter__btn counter__btn--inc" data-act="inc">+1</button>
       <button class="counter__btn counter__btn--dec" data-act="dec">−1</button>
@@ -68,6 +81,11 @@ function buildCard(counter, index) {
     </div>
     <div class="counter__foot">${counter.lastUpdated ? "Last updated " + fmtTime(new Date(counter.lastUpdated)) : "—"}</div>
   `;
+
+  const includeEl = card.querySelector("[data-include]");
+  includeEl.addEventListener("change", () => {
+    updateCounter(counter.id, { includeInTotal: includeEl.checked });
+  });
 
   const titleEl = card.querySelector(".counter__title");
   titleEl.addEventListener("change", () => {
@@ -90,7 +108,7 @@ function buildCard(counter, index) {
   countEl.addEventListener("click", () => setSelected(counter.id));
 
   card.addEventListener("click", (e) => {
-    if (e.target === titleEl || e.target === ratioEl || e.target === countEl) return;
+    if (e.target === titleEl || e.target === ratioEl || e.target === countEl || e.target === includeEl) return;
     setSelected(counter.id);
     const act = e.target?.dataset.act;
     if (!act) return;

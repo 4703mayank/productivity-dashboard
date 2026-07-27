@@ -103,6 +103,7 @@ function addCounter() {
         name: `Counter ${counters.length + 1}`,
         count: 0,
         ratio: 1,
+        includeInTotal: true,   
         clicks: 0,
         increments: 0,
         decrements: 0,

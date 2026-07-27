@@ -3,9 +3,9 @@
 
 const KEY = "la-productivity-v2";
 
-const defaultCounters = ["Submitted", "IP Pool", "Review"];
+const defaultCounters = ["Submitted", "IP Pool", "Labels"];
 
-const defaultRatios = [1, 3, 5];
+const defaultRatios = [1, 3, 1];
 
 function buildDefaultState() {
   return {
@@ -22,6 +22,7 @@ function buildDefaultState() {
       name,
       count: 0,
       ratio: defaultRatios[i] ?? 1,
+      includeInTotal: true,
       clicks: 0,
       increments: 0,
       decrements: 0,
@@ -40,7 +41,9 @@ function load() {
     // Shallow-merge to tolerate older saves missing new fields.
     return {
       settings: { ...base.settings, ...(parsed.settings || {}) },
-      counters: Array.isArray(parsed.counters) ? parsed.counters : base.counters,
+      counters: Array.isArray(parsed.counters)
+        ? parsed.counters.map((c) => ({ includeInTotal: true, ...c }))
+        : base.counters,
       history: Array.isArray(parsed.history) ? parsed.history : [],
     };
   } catch (err) {
