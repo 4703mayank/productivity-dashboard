@@ -38,10 +38,13 @@ export function renderCounters() {
   });
 }
 
+const ACCENTS = ["default"];
+
 function buildCard(counter, index) {
   const card = document.createElement("div");
   card.className = "counter";
   card.dataset.id = counter.id;
+  card.dataset.accent = ACCENTS[index % ACCENTS.length];
   if (counter.id === selectedId) card.classList.add("is-selected");
   if (counter.includeInTotal === false) card.classList.add("is-excluded");
 
@@ -49,22 +52,26 @@ function buildCard(counter, index) {
 
   card.innerHTML = `
     <div class="counter__head">
+      <span class="counter__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+          <rect x="3" y="3" width="7" height="7" rx="1.5" fill="currentColor" opacity=".7"/>
+          <rect x="14" y="3" width="7" height="7" rx="1.5" fill="currentColor"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.5" fill="currentColor"/>
+          <rect x="14" y="14" width="7" height="7" rx="1.5" fill="currentColor" opacity=".7"/>
+        </svg>
+      </span>
       <input class="counter__title" type="text" spellcheck="false" value="${escapeHtml(counter.name)}" />
       <div class="counter__head-right">
         <label class="counter__ratio" title="Contribution ratio (÷N). 3 means every 3 counts as 1.">
           <span>÷</span>
           <input type="number" min="1" step="1" value="${counter.ratio}" data-ratio />
         </label>
+        <label class="counter__toggle" title="Include this counter in the total sum">
+          <input type="checkbox" data-include ${counter.includeInTotal !== false ? "checked" : ""} />
+          <span class="counter__toggle-track"><span class="counter__toggle-thumb"></span></span>
+        </label>
         <button class="counter__del" data-act="del" title="Delete counter" aria-label="Delete counter">×</button>
       </div>
-    </div>
-
-    <div class="counter__toggle-row">
-      <label class="counter__toggle" title="Include this counter in the total sum">
-        <input type="checkbox" data-include ${counter.includeInTotal !== false ? "checked" : ""} />
-        <span class="counter__toggle-track"><span class="counter__toggle-thumb"></span></span>
-      </label>
-      <span class="counter__toggle-label">Count in total</span>
     </div>
 
     <div class="counter__count">
@@ -77,9 +84,12 @@ function buildCard(counter, index) {
     <div class="counter__btns">
       <button class="counter__btn counter__btn--inc" data-act="inc">+1</button>
       <button class="counter__btn counter__btn--dec" data-act="dec">−1</button>
-      <button class="counter__btn counter__btn--reset" data-act="reset">Reset</button>
+      <button class="counter__btn--reset" data-act="reset">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="M3 12a9 9 0 1 0 3-6.7L3 8V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Reset
+      </button>
     </div>
-    <div class="counter__foot">${counter.lastUpdated ? "Last updated " + fmtTime(new Date(counter.lastUpdated)) : "—"}</div>
+    <div class="counter__foot">${counter.lastUpdated ? fmtTime(new Date(counter.lastUpdated)) : "—"}</div>
   `;
 
   const includeEl = card.querySelector("[data-include]");

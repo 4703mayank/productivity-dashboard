@@ -14,8 +14,10 @@ export function startClock() {
 
 function tick() {
   const now = new Date();
-  document.getElementById("clockDate").textContent = fmtDate(now);
-  document.getElementById("clockTime").textContent = fmtTime(now);
+  const timeEl = document.getElementById("clockTime");
+  const dateEl = document.getElementById("clockDate");
+  if (timeEl) timeEl.textContent = fmtTime(now);
+  if (dateEl) dateEl.textContent = fmtDate(now);
   renderSummary();
 }
 
@@ -49,6 +51,12 @@ export function renderSummary() {
   document.getElementById("hourlyBar").style.width = `${Math.min(100, hourlyPct)}%`;
   document.getElementById("sumHourlyPct").textContent = `${hourlyPct.toFixed(2)}%`;
   document.getElementById("sumHourlyRemain").textContent = `Remaining ${round2(hourlyRemaining).toFixed(2)}`;
+
+  // Hero badge — show "+X.XX today" (just the total for now; real delta would need a session baseline)
+  const heroDeltaEl = document.getElementById("heroTodayDelta");
+  if (heroDeltaEl) {
+    heroDeltaEl.textContent = `+${round2(total).toFixed(2)} today`;
+  }
 }
 
 export function initSummaryTarget() {

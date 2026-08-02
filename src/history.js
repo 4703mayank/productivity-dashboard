@@ -55,6 +55,11 @@ export function renderHistory() {
   const body = document.getElementById("historyBody");
   const empty = document.getElementById("historyEmpty");
 
+  // history is stored newest-first. Compute TPT (time since the previous
+  // entry overall, i.e. the next-older entry) BEFORE filtering, so gaps
+  // stay accurate regardless of which entries are currently filtered out.
+  const tptById = computeTPT(history);
+
   const filtered = applyFilters(history);
   document.getElementById("historyCount").textContent = `${filtered.length} entries`;
 
@@ -68,9 +73,33 @@ export function renderHistory() {
   // Render newest first (history is already stored newest-first).
   const frag = document.createDocumentFragment();
   for (const entry of filtered.slice(0, 500)) {
-    frag.appendChild(buildRow(entry));
+    frag.appendChild(buildRow(entry, tptById.get(entry)));
   }
   body.appendChild(frag);
+}
+
+// Maps each entry -> ms since the chronologically previous entry overall.
+// Since `history` is newest-first, the "previous" entry for history[i] is
+// history[i + 1]. The oldest entry (last in the array) has no previous
+// entry, so it maps to null.
+function computeTPT(history) {
+  const map = new Map();
+  for (let i = 0; i < history.length; i++) {
+    const entry = history[i];
+    const older = history[i + 1];
+    map.set(entry, older ? entry.time - older.time : null);
+  }
+  return map;
+}
+
+function formatTPT(ms) {
+  if (ms == null || ms < 0) return "—";
+  const totalSeconds = Math.floor(ms / 1000);
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 
 function applyFilters(history) {
@@ -102,7 +131,7 @@ function toMins(hhmm) {
   return h * 60 + m;
 }
 
-function buildRow(entry) {
+function buildRow(entry, tptMs) {
   const d = new Date(entry.time);
   const tr = document.createElement("tr");
   const diffClass = entry.diff > 0 ? "diff-pos" : entry.diff < 0 ? "diff-neg" : "diff-zero";
@@ -113,7 +142,7 @@ function buildRow(entry) {
     <td>${escapeHtml(entry.counterName)}</td>
     <td class="mono">${entry.old} → ${entry.next}</td>
     <td class="mono ${diffClass}">${diffSign}${entry.diff}</td>
-    <td>${escapeHtml(entry.reason || "")}</td>
+    <td class="mono">${formatTPT(tptMs)}</td>
   `;
   return tr;
 }
