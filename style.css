@@ -27,6 +27,7 @@
 
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --dur: 150ms;
+  --bottomnav-h: 22px;
 
 /* ===== Monochrome Palette ===== */
 
@@ -1251,9 +1252,7 @@ input, select, button {
 
 .modal__actions .btn { flex: 1; }
 
-/* ============================================================
-   Footer
-   ============================================================ */
+
 /* ============================================================
    Footer
    ============================================================ */
@@ -1263,7 +1262,7 @@ input, select, button {
   margin-top: var(--space-7);
   overflow: hidden;
   background: var(--surface);
-  margin-bottom: calc(var(--bottomnav-h));
+  margin-bottom: calc(var(--bottomnav-h) - 22px);
 }
 
 /* Brand-colored top accent line instead of a plain gray border */
@@ -1413,6 +1412,12 @@ input, select, button {
   font-weight: 700;
 }
 
+.bottom-spacer{
+    height:calc(var(--bottomnav-h) + 32px);
+    width:100%;
+    flex-shrink:0;
+}
+
 /* ============================================================
    Responsive — desktop / tablet wide
    ============================================================ */
@@ -1420,7 +1425,7 @@ input, select, button {
 @media (min-width: 720px) {
   #app {
     max-width: min(94vw, 1440px);
-    
+        padding-bottom: calc(var(--bottomnav-h) + 32px);
   }
 
   .counters {
@@ -1541,7 +1546,8 @@ input, select, button {
   .footer__bottom {
     flex-direction: column;
     align-items: flex-start;
-    padding: var(--space-3) var(--space-4) var(--space-4);
+    padding-bottom: -32px;
+
   }
 
   .modal__dialog { width: 100%; }
